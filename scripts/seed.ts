@@ -2070,6 +2070,45 @@ This course is still in draft while the cluster examples are rewritten against t
 
   console.log(`Created ${countRows(schema.lessonProgress)} lesson progress records.`);
 
+  // ─── Bookmarks and Notes ───
+  // Private to each Student, so only the Student who owns them sees these.
+
+  // Emma — flagged two Lessons to revisit and wrote about one of them.
+  db.insert(schema.bookmarks)
+    .values([
+      { userId: students[0].id, lessonId: course1LessonIds[7], createdAt: daysAgo(43) },
+      { userId: students[0].id, lessonId: course2LessonIds[4], createdAt: daysAgo(30) },
+    ])
+    .run();
+
+  // Olivia — one Bookmark on the Lesson she is stuck on.
+  db.insert(schema.bookmarks)
+    .values({ userId: students[2].id, lessonId: course1LessonIds[3], createdAt: daysAgo(27) })
+    .run();
+
+  db.insert(schema.notes)
+    .values([
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[7],
+        body: "Generics: <T> is a placeholder the caller fills in.\nRe-read the constraints part (extends) before module 4.",
+        createdAt: daysAgo(43),
+        updatedAt: daysAgo(41),
+      },
+      {
+        userId: students[2].id,
+        lessonId: course1LessonIds[3],
+        body: "Still not sure when to use `type` vs `interface`. Ask in the discussion?",
+        createdAt: daysAgo(27),
+        updatedAt: daysAgo(27),
+      },
+    ])
+    .run();
+
+  console.log(
+    `Created ${countRows(schema.bookmarks)} bookmarks and ${countRows(schema.notes)} notes.`
+  );
+
   // ─── Quiz Attempts ───
 
   // Helper to record a quiz attempt with answers
@@ -2849,6 +2888,9 @@ This course is still in draft while the cluster examples are rewritten against t
   console.log(`  Enrollments: ${countRows(schema.enrollments)}`);
   console.log(`  Course ratings: ${countRows(schema.courseRatings)}`);
   console.log(`  Lesson comments: ${countRows(schema.comments)}`);
+  console.log(
+    `  Bookmarks: ${countRows(schema.bookmarks)}, notes: ${countRows(schema.notes)}`
+  );
   console.log(
     `  Lesson progress: ${countRows(schema.lessonProgress)} (${countRows(schema.lessonProgress, eq(schema.lessonProgress.status, LessonProgressStatus.Completed))} completed)`
   );
